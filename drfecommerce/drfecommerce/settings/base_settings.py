@@ -5,7 +5,7 @@ import os
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     # External Packages
     "rest_framework",
     # Internal Packages
+    "drfecommerce.apps.product",
 ]
 
 MIDDLEWARE = [
