@@ -6,7 +6,7 @@ load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+print("base dir: ", BASE_DIR)
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
@@ -24,7 +24,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # External Packages
     "rest_framework",
+    "drf_spectacular",
     # Internal Packages
+    "drfecommerce.apps.product",
 ]
 
 MIDDLEWARE = [
@@ -97,4 +99,10 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-REST_FRAMEWORK = {}
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Ecommerce API",
+}
