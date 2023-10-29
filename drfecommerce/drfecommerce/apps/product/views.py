@@ -3,6 +3,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema
+from django.db import connection
+from drfecommerce.apps.utils.sql_debugger import SqlDebugger
 
 from .models import Brand, Category, Product
 from .serializers import BrandSerializer, CategorySerializer, ProductSerializer
@@ -24,7 +26,7 @@ class BrandViewSet(viewsets.ViewSet):
     """
     A simple viewset for viewing Brands
     """
-    queryset = Brand.objects.all()
+    queryset = Brand.objects.is_active()
 
     @extend_schema(responses=BrandSerializer)
     def list(self, request):
@@ -36,17 +38,24 @@ class ProductViewSet(viewsets.ViewSet):
     """
     A simple viewset for viewing Products
     """
-    queryset = Product.objects.all()
+    queryset = Product.objects.is_active()
     lookup_field = "slug"
 
     def retrieve(self, request, slug=None):
         serializer = ProductSerializer(self.queryset.filter(slug=slug), many=True)
-        return Response(serializer.data)
+
+        data = Response(serializer.data)
+  
+        debugger = SqlDebugger()
+        for query in connection.queries:
+            debugger.set_data(query["sql"])
+            debugger.print_sql()
+
+        return data
 
     @extend_schema(responses=ProductSerializer)
     def list(self, request):
         serializer = ProductSerializer(self.queryset, many=True)
-        print(serializer.data)
         return Response(serializer.data)
 
     @action(
