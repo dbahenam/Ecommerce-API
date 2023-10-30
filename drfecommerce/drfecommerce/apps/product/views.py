@@ -9,31 +9,31 @@ from drfecommerce.apps.utils.sql_debugger import SqlDebugger
 from .models import Brand, Category, Product
 from .serializers import BrandSerializer, CategorySerializer, ProductSerializer
 
+@extend_schema(responses=CategorySerializer)
 class CategoryViewSet(viewsets.ViewSet):
     """
     A simple viewset for viewing Categories
     """
     queryset = Category.objects.all()
 
-    @extend_schema(responses=CategorySerializer)
     def list(self, request):
         serializer = CategorySerializer(self.queryset, many=True)
         print(serializer.data) # list of dictionaries
         return Response(serializer.data) # Http response object with data as json
     
-
+@extend_schema(responses=BrandSerializer)
 class BrandViewSet(viewsets.ViewSet):
     """
     A simple viewset for viewing Brands
     """
     queryset = Brand.objects.is_active()
 
-    @extend_schema(responses=BrandSerializer)
     def list(self, request):
         serializer = BrandSerializer(self.queryset, many=True)
         return Response(serializer.data)
 
 
+@extend_schema(responses=ProductSerializer)
 class ProductViewSet(viewsets.ViewSet):
     """
     A simple viewset for viewing Products
@@ -53,22 +53,22 @@ class ProductViewSet(viewsets.ViewSet):
 
         return data
 
-    @extend_schema(responses=ProductSerializer)
     def list(self, request):
         serializer = ProductSerializer(self.queryset, many=True)
         return Response(serializer.data)
 
+    # 
     @action(
         methods=["get"], 
         detail=False, 
-        url_path=r"category/(?P<cat_name>\w+)/all",
+        url_path=r"category/(?P<cat_slug>[\w-]+)/all",
         url_name="all"
     )
-    def list_product_by_category(self, request, cat_name=None):
+    def list_product_by_category_slug(self, request, cat_slug=None):
         """
         An endpoint to return products by category
         """
-        serializer = ProductSerializer(self.queryset.filter(category__name=cat_name), many=True)
+        serializer = ProductSerializer(self.queryset.filter(category__slug=cat_slug), many=True)
         return Response(serializer.data)
 
 

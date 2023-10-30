@@ -4,7 +4,7 @@ from .models import Category, Brand, Product, ProductLine
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ["name"]
+        fields = ["name", "slug"]
 
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,10 +23,10 @@ class ProductSerializer(serializers.ModelSerializer):
     to push the data to when it's deserializing a payload into a model instance.
     """
     brand_name = serializers.CharField(source='brand.name')
-    category_name = serializers.CharField(source="category.name")
+    category_slug = serializers.CharField(source="category.slug")
     product_line = ProductLineSerializer(many=True) # same as the line below
     # lines_of_product = ProductLineSerializer(source='product_line', many=True)
 
     class Meta:
         model = Product
-        fields = ["name", "slug", "description", "brand_name", "category_name", "product_line"]
+        fields = ["name", "slug", "description", "brand_name", "category_slug", "product_line"]
