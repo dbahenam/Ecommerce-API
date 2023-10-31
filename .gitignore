@@ -7,4 +7,4 @@ drf-env/
 schema.yml
 .coverage
 htmlcov/
-../.DS_Store
+.DS_store
