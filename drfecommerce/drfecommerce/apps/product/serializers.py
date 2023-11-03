@@ -1,32 +1,49 @@
 from rest_framework import serializers
-from .models import Category, Brand, Product, ProductLine
+from . import models
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Category
+        model = models.Category
         fields = ["name", "slug"]
+
 
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Brand
+        model = models.Brand
         fields = ["name"]
 
-class ProductLineSerializer(serializers.ModelSerializer):
+
+class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductLine
-        exclude = ["id", "is_active", "product"]
+        model = models.ProductImage
+        exclude = ["productline", "id"]
+
+
+class ProductLineSerializer(serializers.ModelSerializer):
+    product_image = ProductImageSerializer(many=True)
+
+    class Meta:
+        model = models.ProductLine
+        fields = ["price", "sku", "stock_qty", "order", "product_image"]
+
 
 class ProductSerializer(serializers.ModelSerializer):
-    """
-    The source argument in a serializer field tells the serializer where 
-    to pull the data from when it's serializing a model instance or where
-    to push the data to when it's deserializing a payload into a model instance.
-    """
-    brand_name = serializers.CharField(source='brand.name')
+    # The source argument in a serializer field tells the serializer where
+    # to pull the data from when it's serializing a model instance or where
+    # to push the data to when it's deserializing a payload into a model instance.
+    brand_name = serializers.CharField(source="brand.name")
     category_slug = serializers.CharField(source="category.slug")
-    product_line = ProductLineSerializer(many=True) # same as the line below
+    product_line = ProductLineSerializer(many=True)  # same as the line below
     # lines_of_product = ProductLineSerializer(source='product_line', many=True)
 
     class Meta:
-        model = Product
-        fields = ["name", "slug", "description", "brand_name", "category_slug", "product_line"]
+        model = models.Product
+        fields = [
+            "name",
+            "slug",
+            "description",
+            "brand_name",
+            "category_slug",
+            "product_line",
+        ]
