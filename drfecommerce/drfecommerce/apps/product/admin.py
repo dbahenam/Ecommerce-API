@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.urls import reverse
-from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 
 from . import models
@@ -25,7 +24,7 @@ class EditLinkInLine:
         if instance.pk:
             return format_html('<a href="{}">Edit</a>', url)
         else:
-            return "x"
+            return ""
 
 
 class ProductLineInLine(EditLinkInLine, admin.TabularInline):
@@ -63,3 +62,4 @@ class ProductLineAdmin(admin.ModelAdmin):
 
 admin.site.register(models.ProductLine, ProductLineAdmin)
 admin.site.register(models.Product, ProductAdmin)
+# admin.site.register(models.ProductImage)

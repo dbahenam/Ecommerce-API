@@ -54,5 +54,5 @@ class ProductImageFactory(factory.django.DjangoModelFactory):
         model = ProductImage
 
     alternative_text = "test alt text"
-    url = "test.jpg"
+    url = factory.Sequence(lambda n: "test_image_%d" % n)
     productline = factory.SubFactory(ProductLineFactory)

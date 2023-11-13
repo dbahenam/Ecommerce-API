@@ -10,6 +10,7 @@ from .models import Brand, Category, Product
 from .serializers import BrandSerializer, CategorySerializer, ProductSerializer
 
 
+# Let drf_spectacular know which schema we are using
 @extend_schema(responses=CategorySerializer)
 class CategoryViewSet(viewsets.ViewSet):
     """
