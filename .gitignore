@@ -7,4 +7,5 @@ env/
 schema.yml
 .coverage
 htmlcov/
-.DS_store
+**.DS_Store
+../.DS_Store

@@ -21,6 +21,7 @@ Delete a specific category: DELETE /api/category/{id}/
 router.register(r"category", views.CategoryViewSet)
 router.register(r"brand", views.BrandViewSet)
 router.register(r"product", views.ProductViewSet)
+router.register(r"productline", views.ProductLineViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
