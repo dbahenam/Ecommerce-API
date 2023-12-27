@@ -3,11 +3,17 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema
+
 from django.db import connection, reset_queries
 from drfecommerce.apps.utils.sql_debugger import SqlDebugger
 
-from .models import Brand, Category, Product
-from .serializers import BrandSerializer, CategorySerializer, ProductSerializer
+from .models import Brand, Category, Product, ProductLine
+from .serializers import (
+    BrandSerializer,
+    CategorySerializer,
+    ProductSerializer,
+    ProductLineSerializer,
+)
 
 
 # Let drf_spectacular know which schema we are using
@@ -39,20 +45,22 @@ class BrandViewSet(viewsets.ViewSet):
 
 
 @extend_schema(responses=ProductSerializer)
-class ProductViewSet(viewsets.ViewSet):
+class ProductLineViewSet(viewsets.ViewSet):
     """
     A simple viewset for viewing Products
     """
 
-    queryset = Product.objects.is_active()
-    lookup_field = "slug"
+    queryset = ProductLine.objects.is_active()
+    lookup_field = "slug"  # default is pk
 
     def retrieve(self, request, slug=None):
         reset_queries()
-        serializer = ProductSerializer(
+        serializer = ProductLineSerializer(
             self.queryset.filter(slug=slug)
-            .select_related("category", "brand")
-            .prefetch_related("product_line__product_image"),
+            .select_related("category", "brand")  # INNER JOINS
+            .prefetch_related(  # 1-N, N-N, Reverse Foreign Keys
+                "product__product_image"
+            ),
             many=True,
         )
 
@@ -66,21 +74,31 @@ class ProductViewSet(viewsets.ViewSet):
         return data
 
     def list(self, request):
-        serializer = ProductSerializer(self.queryset, many=True)
+        serializer = ProductLineSerializer(self.queryset, many=True)
         return Response(serializer.data)
 
     #
     @action(
         methods=["get"],
         detail=False,
-        url_path=r"category/(?P<cat_slug>[\w-]+)/all",
+        url_path=r"category/(?P<cat_slug>[\w-]+)/all",  # regex
         url_name="all",
     )
-    def list_product_by_category_slug(self, request, cat_slug=None):
+    def list_product_line_by_category_slug(self, request, cat_slug=None):
         """
         An endpoint to return products by category
         """
-        serializer = ProductSerializer(
+        serializer = ProductLineSerializer(
             self.queryset.filter(category__slug=cat_slug), many=True
         )
+        return Response(serializer.data)
+
+
+@extend_schema(responses=ProductLineSerializer)
+class ProductViewSet(viewsets.ViewSet):
+    queryset = Product.objects.all()
+
+    def list(self, request):
+        serializer = ProductSerializer(self.queryset, many=True)
+        # print(serializer.data)
         return Response(serializer.data)

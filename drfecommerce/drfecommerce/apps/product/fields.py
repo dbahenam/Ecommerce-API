@@ -5,16 +5,17 @@ from django.core.exceptions import ObjectDoesNotExist
 
 class OrderField(models.PositiveIntegerField):
     description = (
-        "An ordering field that determines order based on the latest value held "
+        "An ordering field that determines/generates order based on the latest value held "
         "for a group of objects sharing the same attribute defined in 'unique_for_field'. "
         "Uniqueness should be ensured by the model using this field."
     )
 
+    # unique_for_field is a custom property we will use to determine what field the value should be unique for
     def __init__(self, unique_for_field=None, *args, **kwargs):
         self.unique_for_field = unique_for_field
         super().__init__(*args, **kwargs)
 
-    def check(self, **kwargs):
+    def check(self, **kwargs):  # included in model fields
         errors = super().check(**kwargs)
         field_names = [f.name for f in self.model._meta.get_fields()]
 
@@ -43,9 +44,9 @@ class OrderField(models.PositiveIntegerField):
         qs = self.model.objects.all()  # get all objects, e.g from product line
 
         if getattr(model_instance, self.attname) is None:  # self.attname = order
-            qs = self.model.objects.all()  # get all objects, e.g product line
+            qs = self.model.objects.all()  # get all objects
             try:
-                query = {  # {Product: kobes}
+                query = {  # {Product: <Product:kobes>} product where product = kobes
                     self.unique_for_field: getattr(
                         model_instance, self.unique_for_field
                     )
