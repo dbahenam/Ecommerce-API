@@ -10,6 +10,9 @@ from rest_framework.test import APIClient
 from .factories import (
     CategoryFactory,
     BrandFactory,
+    AttributeFactory,
+    AttributeValueFactory,
+    ProductTypeFactory,
     ProductFactory,
     ProductLineFactory,
     ProductImageFactory,
@@ -21,6 +24,9 @@ register(BrandFactory)
 register(ProductFactory)
 register(ProductLineFactory)
 register(ProductImageFactory)
+register(AttributeValueFactory)
+register(AttributeFactory)
+register(ProductTypeFactory)
 
 
 """
@@ -30,7 +36,6 @@ From Djangos documentation:
     In fact, it will run just fine with no web server running at all!
     That is because it avoids the overhead of HTTP and deals directly with the Django framework. 
     This helps make the unit tests run quickly.
-
     The test client is not capable of retrieving web pages that are not powered by your Django project.
 """
 

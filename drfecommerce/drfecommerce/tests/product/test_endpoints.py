@@ -17,7 +17,6 @@ class TestCategoryEndpoints:
         # Assert
         assert response.status_code == 200
         x = json.loads(response.content)
-        print("x is: ", x)
         assert len(json.loads(response.content)) == 5
 
 
@@ -34,21 +33,21 @@ class TestBrandEndpoints:
         assert len(json.loads(response.content)) == 5
 
 
-class TestProductEndpoints:
+class TestProductLineEndpoints:
     endpoint = "/api/product/"
 
-    def test_product_get_all(self, product_factory, api_client_callable):
+    def test_product_get_all(self, product_line_factory, api_client_callable):
         # Arrange
-        product_factory.create_batch(5)
+        product_line_factory.create_batch(5)
         # Act
         response = api_client_callable().get(self.endpoint)
         # Assert
         assert response.status_code == 200
         assert len(json.loads(response.content)) == 5
 
-    def test_product_get_single(self, product_factory, api_client_callable):
+    def test_product_line_get_single(self, product_line_factory, api_client_callable):
         # Arrange
-        prod_obj = product_factory.create(slug="product_slug")
+        prod_obj = product_line_factory.create(slug="product_slug")
         # Act
         response = api_client_callable().get(f"{self.endpoint}{prod_obj.slug}/")
         # Assert
@@ -62,7 +61,8 @@ class TestProductEndpoints:
         # create a category
         cat_obj = category_factory.create(slug="cat-slug")
         # create a product with that category
-        prod_obj = product_factory.create(category=cat_obj)
+        prod_obj = product_factory.create_batch(5, category=cat_obj)
+        prod_obj = product_factory.create_batch(3)
         # Act
         # get product by category slug
         response = api_client_callable().get(
@@ -70,7 +70,7 @@ class TestProductEndpoints:
         )
         # Assert
         assert response.status_code == 200
-        assert len(json.loads(response.content)) == 1
+        assert len(json.loads(response.content)) == 5
 
 
 class TestProductLineEndpoints:

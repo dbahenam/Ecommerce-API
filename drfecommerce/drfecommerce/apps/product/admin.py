@@ -26,8 +26,18 @@ class EditLinkInLine:
         else:
             return ""
 
+    def add(self, instance):
+        url = reverse(
+            f"admin:{instance._meta.app_label}_{instance._meta.model_name}_add"
+        )
+        return format_html('<a href="{}">Add</a>', url)
 
-class ProductLineInLine(EditLinkInLine, admin.TabularInline):
+
+class ProductImageInLine(admin.TabularInline):
+    model = models.ProductImage
+
+
+class ProductInLine(EditLinkInLine, admin.TabularInline):
     """
     The admin interface has the ability to edit models on the same page as a parent model.
     These are called inlines.
@@ -38,28 +48,42 @@ class ProductLineInLine(EditLinkInLine, admin.TabularInline):
         to produce the output for a read-only "field" on the admin page.
     """
 
-    model = models.ProductLine
+    model = models.Product
     readonly_fields = ["edit"]
 
 
-class ProductImageInLine(admin.TabularInline):
-    model = models.ProductImage
+class ProductAttributeValueInLine(admin.TabularInline):
+    model = models.ProductAttributeValue
 
 
-class ProductAdmin(admin.ModelAdmin):
+class ProductLineAdmin(admin.ModelAdmin):
     """
     ModelAdmin class is the representation of a model in the admin interface.
     Only create a ModelAdmin object if you are going to customize the representation of a model
     in the admin interface.
     """
 
-    inlines = [ProductLineInLine]
+    inlines = [ProductInLine]
 
 
-class ProductLineAdmin(admin.ModelAdmin):
-    inlines = [ProductImageInLine]
+class AttributeValueInLine(admin.TabularInline):
+    model = models.AttributeValue.product.through
 
 
-admin.site.register(models.ProductLine, ProductLineAdmin)
+class ProductAdmin(admin.ModelAdmin):
+    inlines = [AttributeValueInLine, ProductImageInLine]
+
+
+class AttributeInLine(admin.TabularInline):
+    model = models.Attribute.product_type.through
+
+
+class ProductTypeAdmin(admin.ModelAdmin):
+    inlines = [AttributeInLine]
+
+
 admin.site.register(models.Product, ProductAdmin)
-# admin.site.register(models.ProductImage)
+admin.site.register(models.ProductLine, ProductLineAdmin)
+admin.site.register(models.AttributeValue)
+admin.site.register(models.Attribute)
+admin.site.register(models.ProductType, ProductTypeAdmin)
